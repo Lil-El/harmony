@@ -1,23 +1,70 @@
+// @formatter:on
+import { SymbolGlyphModifier } from '@kit.ArkUI';
+
+
 @Entry
 @Component
 struct Index {
-  @State message: string = 'Hello World';
+  // 路由页面栈
+  private pageStack: NavPathStack = new NavPathStack();
+
+  // 路由：菜单项
+  private navigationMenuItems: Array<NavigationMenuItem> = [
+    { value: "通知", symbolIcon: new SymbolGlyphModifier($r("sys.symbol.bell_fill")) },
+    {
+      value: "模式",
+      symbolIcon: new SymbolGlyphModifier($r("sys.symbol.moon_fill")),
+      // isEnabled: false,
+      action: () => {
+        this.getUIContext().getPromptAction().showToast({
+          message: "暂不可用"
+        })
+      }
+    }
+  ];
+
+  // 路由：工具栏
+  private navigationToolBarItems: Array<ToolbarItem> = [
+    { value: "首页" },
+    { value: "广场" },
+    { value: "我的" }
+  ];
+
+  @Builder
+  navBuilder(name: string) {
+    myNavDestination();
+  }
+
+  // 状态
+  @State message: string = "Hello World!";
 
   build() {
-    RelativeContainer() {
-      Text(this.message)
-        .id('HelloWorld')
-        .fontSize($r('app.float.page_text_font_size'))
-        .fontWeight(FontWeight.Bold)
-        .alignRules({
-          center: { anchor: '__container__', align: VerticalAlign.Center },
-          middle: { anchor: '__container__', align: HorizontalAlign.Center }
-        })
+    Navigation(this.pageStack) {
+      Button(this.message)
         .onClick(() => {
-          this.message = 'Welcome123';
+          this.pageStack.pushPath({ name: "Button Click." })
         })
     }
+    .title("Title")
+    .menus(this.navigationMenuItems)
+    .toolbarConfiguration(this.navigationToolBarItems)
+    .hideToolBar(!true)
+    .hideTitleBar(!true)
+    .mode(NavigationMode.Auto)
+    .navBarWidth(350)
+    .navBarPosition(NavBarPosition.Start)
+    .navDestination(this.navBuilder)
     .height('100%')
     .width('100%')
+    .backgroundColor("#eeeeee")
+  }
+}
+
+@Component
+struct myNavDestination {
+  build() {
+    NavDestination() {
+      Text("myNavDestination")
+    }
   }
 }
