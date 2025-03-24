@@ -32,7 +32,9 @@ struct Index {
 
   @Builder
   navBuilder(name: string) {
-    myNavDestination();
+    if (name === "PageA") {
+      myNavDestination();
+    }
   }
 
   // 状态
@@ -42,7 +44,7 @@ struct Index {
     Navigation(this.pageStack) {
       Button(this.message)
         .onClick(() => {
-          this.pageStack.pushPath({ name: "Button Click." })
+          this.pageStack.pushPath({ name: "PageA" })
         })
     }
     .title("Title")
@@ -50,8 +52,8 @@ struct Index {
     .toolbarConfiguration(this.navigationToolBarItems)
     .hideToolBar(!true)
     .hideTitleBar(!true)
-    .mode(NavigationMode.Auto)
-    .navBarWidth(350)
+    .mode(NavigationMode.Split)
+    .navBarWidth(375 / 2)
     .navBarPosition(NavBarPosition.Start)
     .navDestination(this.navBuilder)
     .height('100%')
