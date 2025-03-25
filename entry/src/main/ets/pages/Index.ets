@@ -1,72 +1,127 @@
+import Timer from "ets/utils/Timer";
+
 // @formatter:on
-import { SymbolGlyphModifier } from '@kit.ArkUI';
-
-
 @Entry
 @Component
 struct Index {
   // 路由页面栈
   private pageStack: NavPathStack = new NavPathStack();
 
-  // 路由：菜单项
-  private navigationMenuItems: Array<NavigationMenuItem> = [
-    { value: "通知", symbolIcon: new SymbolGlyphModifier($r("sys.symbol.bell_fill")) },
-    {
-      value: "模式",
-      symbolIcon: new SymbolGlyphModifier($r("sys.symbol.moon_fill")),
-      // isEnabled: false,
-      action: () => {
-        this.getUIContext().getPromptAction().showToast({
-          message: "暂不可用"
-        })
-      }
-    }
-  ];
-
-  // 路由：工具栏
-  private navigationToolBarItems: Array<ToolbarItem> = [
-    { value: "首页" },
-    { value: "广场" },
-    { value: "我的" }
-  ];
-
+  /**
+   * navDestination 的构建函数
+   *
+   * @param name 路由名称
+   * @param param 路由参数
+   *
+   * @description
+   * 使用 Navigation().navDestination() 会和 routerMap 冲突
+   * builder 里可以根据不同的 name 设置不同的组件
+   * 组件必须由 NavDestination 组件包裹
+   */
   @Builder
-  navBuilder(name: string) {
-    if (name === "PageA") {
-      myNavDestination();
-    }
+  builder(name: string, param: Object) {
   }
 
-  // 状态
-  @State message: string = "Hello World!";
+  // aboutToAppear() {
+  //   this.pageStack.pushPath({ name: 'Home' });
+  // }
 
   build() {
+    /**
+     * Navigation 的结构：类似于系统设置页面，包含标题、菜单、工具，每一个列表项都是一个路由
+     *
+     * Navigation() inspector 结构：
+     * NavBar：
+     *    -> Title：
+     *       -> Menus
+     *    -> 子组件
+     *    -> ToolBar
+     * NavigationContent -> NavDestination
+     *
+     * 只有在路由跳转之后的页面才属于 NavigationContent，默认的子组件都是NavBar区域下
+     *
+     * 路由1：
+     *  使用.navDestination(Builder) 会替代 routerMap
+     *
+     * 路由2：
+     *  .hideNavBar(true) 将整个页面变为空白，在 appear 中直接跳转其他页面，摆脱 Navigation 页面的结构局限
+     *
+     * 路由3：（本示例采用这个方式）
+     *  .hideToolBar, .hideTitleBar 后，子组件内容将占满整个 NavBar 区域
+     */
     Navigation(this.pageStack) {
-      Button(this.message)
-        .onClick(() => {
-          this.pageStack.pushPath({ name: "PageA" })
-        })
+      StartPage({ duration: 3, pageStack: this.pageStack })
     }
-    .title("Title")
-    .menus(this.navigationMenuItems)
-    .toolbarConfiguration(this.navigationToolBarItems)
-    .hideToolBar(!true)
-    .hideTitleBar(!true)
-    .mode(NavigationMode.Split)
-    .navBarWidth(375 / 2)
-    .navBarPosition(NavBarPosition.Start)
-    .navDestination(this.navBuilder)
+    // .title("Title")
+    // .menus(this.navigationMenuItems)  // symbolIcon: new SymbolGlyphModifier($r("sys.symbol.moon_fill"))
+    // .toolbarConfiguration(this.navigationToolBarItems)
+    // .mode(NavigationMode.Auto)
+    // .navBarWidth(375 / 2)
+    // .navBarPosition(NavBarPosition.Start)
+    // .navDestination(this.builder)
+    // .hideNavBar(true)
+    .hideToolBar(true)
+    .hideTitleBar(true)
     .height('100%')
     .width('100%')
-    .backgroundColor("#eeeeee")
+    .backgroundColor(0xffffff)
   }
 }
 
 @Component
-struct myNavDestination {
-  build() {
-    NavDestination() {
-      Text("myNavDestination")
+struct StartPage {
+  // 启动页时长
+  @Prop duration: number = 0;
+
+  // 定时器
+  private timer: number = -1;
+
+  pageStack: NavPathStack = new NavPathStack();
+
+  aboutToAppear(): void {
+    // Tips: Harmony 的 setInterval 居然是从 0 开始，和 JavaScript 不同
+    this.timer = setInterval(() => {
+      if (this.duration === 0) {
+        this.replacePage();
+        return;
+      }
+
+      this.duration--;
+    }, 1000)
+  }
+
+  destroyTimer(): void {
+    if (this.timer >= 0) {
+      clearInterval(this.timer);
+      this.timer = -1;
     }
+  }
+
+  // 页面跳转
+  replacePage(): void {
+    if (this.timer) {
+      clearInterval(this.timer);
+    }
+
+    this.getUIContext().getPromptAction().showToast({ message: "Welcome login." });
+    this.pageStack.replacePathByName("Home", {}, true);
+  }
+
+  aboutToDisappear(): void {
+    if (this.timer) {
+      clearInterval(this.timer);
+    }
+  }
+
+  build() {
+    Stack({ alignContent: Alignment.TopEnd }) {
+      Image($r("app.media.start"))
+
+      Button(`跳过 ${this.duration}`)
+        .buttonStyle(ButtonStyleMode.TEXTUAL)
+        .margin(30)
+        .onClick(() => this.replacePage())
+    }
+    .size({ width: "100%", height: "100%" })
   }
 }

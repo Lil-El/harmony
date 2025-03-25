@@ -24,6 +24,12 @@ export default class EntryAbility extends UIAbility {
         return;
       }
       hilog.info(DOMAIN, 'testTag', 'Succeeded in loading the content.');
+
+      // 设置窗口全屏
+      const windowClass: window.Window = windowStage.getMainWindowSync();
+      windowClass.setWindowLayoutFullScreen(true);
+
+
     });
   }
 
