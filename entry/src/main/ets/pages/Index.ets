@@ -1,6 +1,6 @@
-import Timer from "ets/utils/Timer";
-
 // @formatter:on
+import Timer, { TimerData } from "ets/utils/Timer";
+
 @Entry
 @Component
 struct Index {
@@ -74,13 +74,13 @@ struct StartPage {
   @Prop duration: number = 0;
 
   // 定时器
-  private timer: number = -1;
+  private timerData: TimerData | undefined;
 
   pageStack: NavPathStack = new NavPathStack();
 
   aboutToAppear(): void {
     // Tips: Harmony 的 setInterval 居然是从 0 开始，和 JavaScript 不同
-    this.timer = setInterval(() => {
+    this.timerData = Timer.createInterval(() => {
       if (this.duration === 0) {
         this.replacePage();
         return;
@@ -88,19 +88,13 @@ struct StartPage {
 
       this.duration--;
     }, 1000)
-  }
 
-  destroyTimer(): void {
-    if (this.timer >= 0) {
-      clearInterval(this.timer);
-      this.timer = -1;
-    }
   }
 
   // 页面跳转
   replacePage(): void {
-    if (this.timer) {
-      clearInterval(this.timer);
+    if (this.timerData) {
+      Timer.clear(this.timerData);
     }
 
     this.getUIContext().getPromptAction().showToast({ message: "Welcome login." });
@@ -108,8 +102,8 @@ struct StartPage {
   }
 
   aboutToDisappear(): void {
-    if (this.timer) {
-      clearInterval(this.timer);
+    if (this.timerData) {
+      Timer.clear(this.timerData);
     }
   }
 

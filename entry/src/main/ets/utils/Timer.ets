@@ -1,50 +1,57 @@
 type TimerType = "TIMEOUT" | "INTERVAL";
 
-interface TimerData {
+export interface TimerData {
   name: TimerType
   ID: number
 }
 
 export default class Timer {
-  timers: TimerData[] = [];
+  private static _timers: TimerData[] = [];
 
-  createTimeout(callback: Function, delay: number = 0) {
+  public static get timers(): TimerData[] {
+    return Timer._timers;
+  }
+
+  static createTimeout(callback: Function, delay: number = 0) {
     const timerID = setTimeout(callback, delay);
     const timerData: TimerData = {
       name: "TIMEOUT",
       ID: timerID
     }
 
-    this.timers.push(timerData);
+    Timer._timers.push(timerData);
     return timerData;
   }
 
-  createInterval(callback: Function, delay: number = 0) {
-    const timerID = setTimeout(callback, delay);
+  static createInterval(callback: Function, delay: number = 0) {
+    const timerID = setInterval(callback, delay);
     const timerData: TimerData = {
       name: "INTERVAL",
       ID: timerID
     }
 
-    this.timers.push(timerData);
+    Timer._timers.push(timerData);
     return timerData;
   }
 
-  clear(data: TimerData, index?: number) {
-    if (data.name === "TIMEOUT") {
-      clearTimeout(data.ID);
-    } else {
-      clearInterval(data.ID);
-    }
+  static clear(data: TimerData, index?: number) {
+    index = index || Timer._timers.indexOf(data);
 
-    index = index || this.timers.indexOf(data);
-    this.timers.splice(index, 1);
+    if (index >= 0) {
+      if (data.name === "TIMEOUT") {
+        clearTimeout(data.ID);
+      } else {
+        clearInterval(data.ID);
+      }
+
+      Timer._timers.splice(index, 1);
+    }
   }
 
-  clearAll() {
-    this.timers.reduceRight((_, data, index) => {
-      this.clear(data, index);
-      
+  static clearAll() {
+    Timer._timers.reduceRight((_, data, index) => {
+      Timer.clear(data, index);
+
       return data;
     })
   }
