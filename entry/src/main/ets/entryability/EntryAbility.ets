@@ -29,7 +29,11 @@ export default class EntryAbility extends UIAbility {
       const windowClass: window.Window = windowStage.getMainWindowSync();
       windowClass.setWindowLayoutFullScreen(true);
 
-
+      /**
+       * TODO:
+       * 1. 获取屏幕导航栏等区域的高度；window、display不同方式
+       * 2. 设置避让（通用属性expandSafeArea）
+       */
     });
   }
 

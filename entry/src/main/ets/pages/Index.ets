@@ -1,11 +1,14 @@
 // @formatter:on
-import Timer, { TimerData } from "ets/utils/Timer";
+import Timer, { TimerData } from "entry/ets/utils/Timer";
 
 @Entry
 @Component
 struct Index {
   // 路由页面栈
   private pageStack: NavPathStack = new NavPathStack();
+
+  // 退出计次
+  private backCount: number = 0;
 
   /**
    * navDestination 的构建函数
@@ -22,9 +25,26 @@ struct Index {
   builder(name: string, param: Object) {
   }
 
-  // aboutToAppear() {
-  //   this.pageStack.pushPath({ name: 'Home' });
-  // }
+  aboutToAppear() {
+    const ctx = this.getUIContext().getHostContext();
+    console.dir(ctx)
+    // TODO:
+    // 1. 使用 Context 关闭应用程序
+    // 隐藏本页面的状态栏等：1.expandSafeArea 沉浸式效果；2. window设置状态栏属性和隐藏
+
+    // this.pageStack.pushPath({ name: 'Home' });
+  }
+
+  onBackPress(): boolean | void {
+    if (this.backCount === 0) {
+      this.backCount++;
+      this.getUIContext().getPromptAction().showToast({ message: "再按一次退出", alignment: Alignment.Top });
+      return true;
+    }
+
+    this.backCount = 0;
+    return false;
+  }
 
   build() {
     /**
@@ -88,7 +108,6 @@ struct StartPage {
 
       this.duration--;
     }, 1000)
-
   }
 
   // 页面跳转

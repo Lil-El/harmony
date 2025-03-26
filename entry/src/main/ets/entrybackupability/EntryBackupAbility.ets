@@ -9,7 +9,6 @@ export default class EntryBackupAbility extends BackupExtensionAbility {
     await Promise.resolve();
   }
 
-  //@formatter:off
   async onRestore(bundleVersion: BundleVersion){
     hilog.info(DOMAIN, 'testTag', 'onRestore ok %{public}s', JSON.stringify(bundleVersion));
     await Promise.resolve();

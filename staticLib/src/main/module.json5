@@ -1,0 +1,9 @@
+{
+  "module": {
+    "name": "staticLib",
+    "type": "har",
+    "deviceTypes": [
+      "default"
+    ]
+  }
+}
