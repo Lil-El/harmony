@@ -1,5 +1,7 @@
 // @formatter:on
 import Timer, { TimerData } from "entry/ets/utils/Timer";
+import { window } from "@kit.ArkUI";
+import { common } from "@kit.AbilityKit";
 
 @Entry
 @Component
@@ -26,11 +28,29 @@ struct Index {
   }
 
   aboutToAppear() {
-    const ctx = this.getUIContext().getHostContext();
-    console.dir(ctx)
+    const ctx = this.getUIContext().getHostContext() as common.UIAbilityContext;
+
+    setTimeout(() => {
+      ctx.terminateSelf(() => {
+        console.log("terminateSelf")
+      })
+    }, 3000)
+
+    // TODO: 不同方式获取windowStage
+    // 模块获取
+    // window.getLastWindow(ctx).windowStage; // 全局模块获取 windowStage
+
+    // context 获取
+    // const windowStage: window.WindowStage = ctx.windowStage as window.WindowStage;
+    // const windowClass = windowStage.getMainWindowSync();
+    // const props = windowClass.getWindowSystemBarProperties()
+    // console.dir(props)
+
     // TODO:
     // 1. 使用 Context 关闭应用程序
     // 隐藏本页面的状态栏等：1.expandSafeArea 沉浸式效果；2. window设置状态栏属性和隐藏
+
+    // TODO: 获取 UIAbility 上的 customRealName
 
     // this.pageStack.pushPath({ name: 'Home' });
   }
