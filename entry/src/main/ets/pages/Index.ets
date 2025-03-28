@@ -9,9 +9,6 @@ struct Index {
   // 路由页面栈
   private pageStack: NavPathStack = new NavPathStack();
 
-  // 退出计次
-  private backCount: number = 0;
-
   /**
    * navDestination 的构建函数
    *
@@ -29,41 +26,19 @@ struct Index {
 
   aboutToAppear() {
     const ctx = this.getUIContext().getHostContext() as common.UIAbilityContext;
+    const windowStage: window.WindowStage = ctx.windowStage as window.WindowStage; // createSubWindow...
+    const windowClass = windowStage.getMainWindowSync();
 
-    setTimeout(() => {
-      ctx.terminateSelf(() => {
-        console.log("terminateSelf")
-      })
-    }, 3000)
-
-    // TODO: 不同方式获取windowStage
-    // 模块获取
-    // window.getLastWindow(ctx).windowStage; // 全局模块获取 windowStage
-
-    // context 获取
-    // const windowStage: window.WindowStage = ctx.windowStage as window.WindowStage;
-    // const windowClass = windowStage.getMainWindowSync();
-    // const props = windowClass.getWindowSystemBarProperties()
-    // console.dir(props)
-
-    // TODO:
-    // 1. 使用 Context 关闭应用程序
-    // 隐藏本页面的状态栏等：1.expandSafeArea 沉浸式效果；2. window设置状态栏属性和隐藏
-
-    // TODO: 获取 UIAbility 上的 customRealName
+    if (canIUse("SystemCapability.Window.SessionManager")) {
+      windowClass.setSpecificSystemBarEnabled("status", false)
+      windowClass.setSpecificSystemBarEnabled("navigation", false)
+    }
 
     // this.pageStack.pushPath({ name: 'Home' });
   }
 
   onBackPress(): boolean | void {
-    if (this.backCount === 0) {
-      this.backCount++;
-      this.getUIContext().getPromptAction().showToast({ message: "再按一次退出", alignment: Alignment.Top });
-      return true;
-    }
-
-    this.backCount = 0;
-    return false;
+    return true;
   }
 
   build() {
@@ -92,19 +67,10 @@ struct Index {
     Navigation(this.pageStack) {
       StartPage({ duration: 3, pageStack: this.pageStack })
     }
-    // .title("Title")
-    // .menus(this.navigationMenuItems)  // symbolIcon: new SymbolGlyphModifier($r("sys.symbol.moon_fill"))
-    // .toolbarConfiguration(this.navigationToolBarItems)
-    // .mode(NavigationMode.Auto)
-    // .navBarWidth(375 / 2)
-    // .navBarPosition(NavBarPosition.Start)
-    // .navDestination(this.builder)
-    // .hideNavBar(true)
     .hideToolBar(true)
     .hideTitleBar(true)
     .height('100%')
     .width('100%')
-    .backgroundColor(0xffffff)
   }
 }
 
@@ -152,7 +118,7 @@ struct StartPage {
 
       Button(`跳过 ${this.duration}`)
         .buttonStyle(ButtonStyleMode.TEXTUAL)
-        .margin(30)
+        .margin({ top: 40, right: 10 })
         .onClick(() => this.replacePage())
     }
     .size({ width: "100%", height: "100%" })

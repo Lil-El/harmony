@@ -1,5 +1,6 @@
 // @formatter:on
 import { SymbolGlyphModifier } from '@kit.ArkUI';
+import { common } from '@kit.AbilityKit';
 
 @Builder
 export function HomeBuilder(name: string, param: Object) {
@@ -8,6 +9,8 @@ export function HomeBuilder(name: string, param: Object) {
 
 @Component
 struct Home {
+  @StorageProp("statusBarHeight") statusBarHeight: number = 0;
+
   // 路由：菜单项
   private navigationMenuItems: Array<NavigationMenuItem> = [
     { value: "通知", symbolIcon: new SymbolGlyphModifier($r("sys.symbol.bell_fill")) },
@@ -30,8 +33,47 @@ struct Home {
     { value: "我的" }
   ];
 
+  // 退出计次
+  private backCount: number = 0;
+
   // 状态
   @State message: string = "Hello World!";
+
+  aboutToAppear(): void {
+    const ctx = this.getUIContext().getHostContext() as common.UIAbilityContext;
+    const windowClass = ctx.windowStage.getMainWindowSync();
+
+    const promiseArr: Promise<void>[] = [];
+
+    if (canIUse("SystemCapability.Window.SessionManager")) {
+      promiseArr.push(windowClass.setSpecificSystemBarEnabled("status", true));
+      promiseArr.push(windowClass.setSpecificSystemBarEnabled("navigation", true));
+
+      Promise.all(promiseArr).then(() => {
+        windowClass.setWindowSystemBarProperties({
+          statusBarColor: '#ffffff',
+          statusBarContentColor: '#000000',
+          navigationBarColor: '#00ff00',
+          navigationBarContentColor: '#00ffff'
+        })
+      })
+    }
+  }
+
+  handleBackPress(): boolean {
+    if (this.backCount === 0) {
+      this.backCount++;
+      this.getUIContext().getPromptAction().showToast({ message: "再按一次退出", alignment: Alignment.Top });
+      setTimeout(() => {
+        this.backCount = 0;
+      }, 1000)
+    } else {
+      const ctx = this.getUIContext().getHostContext() as common.UIAbilityContext;
+      ctx.terminateSelf();
+    }
+
+    return true;
+  }
 
   build() {
     NavDestination() {
@@ -41,9 +83,11 @@ struct Home {
     .menus(this.navigationMenuItems)
     .toolbarConfiguration(this.navigationToolBarItems)
     .hideToolBar(true)
-    .hideTitleBar(!true)
+    .hideTitleBar(false)
     .height('100%')
     .width('100%')
     .backgroundColor(0xffffff)
+    .onBackPressed(() => this.handleBackPress())
+    .safeAreaPadding({ top: px2vp(this.statusBarHeight) }) // 设置组件安全区域
   }
 }

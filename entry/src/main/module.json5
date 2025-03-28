@@ -32,6 +32,12 @@
               "action.system.home"
             ]
           }
+        ],
+        "metadata": [
+          {
+            "name": "TestRealName",
+            "value": "Minooooo!"
+          }
         ]
       }
     ],

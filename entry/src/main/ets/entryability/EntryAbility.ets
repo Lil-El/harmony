@@ -5,8 +5,6 @@ import { window } from '@kit.ArkUI';
 const DOMAIN = 0x0000;
 
 export default class EntryAbility extends UIAbility {
-  public customRealName: string = "MINO"
-
   onCreate(want: Want, launchParam: AbilityConstant.LaunchParam): void {
     this.context.getApplicationContext().setColorMode(ConfigurationConstant.ColorMode.COLOR_MODE_NOT_SET);
     hilog.info(DOMAIN, 'testTag', '%{public}s', 'Ability onCreate');
@@ -31,11 +29,9 @@ export default class EntryAbility extends UIAbility {
       const windowClass: window.Window = windowStage.getMainWindowSync();
       windowClass.setWindowLayoutFullScreen(true);
 
-      /**
-       * TODO:
-       * 1. 获取屏幕导航栏等区域的高度；window、display不同方式
-       * 2. 设置避让（通用属性expandSafeArea）
-       */
+      // 获取并设置状态栏高度
+      const avoidArea = windowClass.getWindowAvoidArea(window.AvoidAreaType.TYPE_SYSTEM);
+      AppStorage.setOrCreate("statusBarHeight", avoidArea.topRect.height);
     });
   }
 
