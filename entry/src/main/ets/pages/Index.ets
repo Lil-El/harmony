@@ -25,6 +25,7 @@ struct Index {
   }
 
   aboutToAppear() {
+    // TODO: 封装隐藏状态栏逻辑；移除Timer逻辑；封装返回按钮的禁用逻辑；
     const ctx = this.getUIContext().getHostContext() as common.UIAbilityContext;
     const windowStage: window.WindowStage = ctx.windowStage as window.WindowStage; // createSubWindow...
     const windowClass = windowStage.getMainWindowSync();
