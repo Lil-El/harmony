@@ -1,6 +1,8 @@
 // @formatter:on
 import { SymbolGlyphModifier } from '@kit.ArkUI';
 import { common } from '@kit.AbilityKit';
+import BackToExit from '../utils/BackToExit';
+import commonAttributeModifier, { titleAttributeModifier } from "ets/components/NavDestination/AttributeModifier"
 
 @Builder
 export function HomeBuilder(name: string, param: Object) {
@@ -33,11 +35,15 @@ struct Home {
     { value: "我的" }
   ];
 
-  // 退出计次
-  private backCount: number = 0;
+  private commonAttrModifier: commonAttributeModifier = new commonAttributeModifier();
+
+  @State private titleAttrModifier: titleAttributeModifier = new titleAttributeModifier("首页");
+
+  // 退出
+  private back2Exit: BackToExit = new BackToExit(this.getUIContext());
 
   // 状态
-  @State message: string = "Hello World!";
+  @State message: string = "Change Title '主页'";
 
   aboutToAppear(): void {
     const ctx = this.getUIContext().getHostContext() as common.UIAbilityContext;
@@ -60,34 +66,15 @@ struct Home {
     }
   }
 
-  handleBackPress(): boolean {
-    if (this.backCount === 0) {
-      this.backCount++;
-      this.getUIContext().getPromptAction().showToast({ message: "再按一次退出", alignment: Alignment.Top });
-      setTimeout(() => {
-        this.backCount = 0;
-      }, 1000)
-    } else {
-      const ctx = this.getUIContext().getHostContext() as common.UIAbilityContext;
-      ctx.terminateSelf();
-    }
-
-    return true;
-  }
-
   build() {
     NavDestination() {
-      Button(this.message)
+      Button(this.message).onClick(() => this.titleAttrModifier.title = "主页")
     }
-    .title("Title")
+    .attributeModifier(this.titleAttrModifier)
     .menus(this.navigationMenuItems)
     .toolbarConfiguration(this.navigationToolBarItems)
-    .hideToolBar(true)
-    .hideTitleBar(false)
-    .height('100%')
-    .width('100%')
-    .backgroundColor(0xffffff)
-    .onBackPressed(() => this.handleBackPress())
+    .attributeModifier(this.commonAttrModifier)
+    .onBackPressed(() => this.back2Exit.backPressed())
     .safeAreaPadding({ top: px2vp(this.statusBarHeight) }) // 设置组件安全区域
   }
 }
