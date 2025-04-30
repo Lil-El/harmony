@@ -65,7 +65,7 @@ struct Index {
      *  .hideToolBar, .hideTitleBar 后，子组件内容将占满整个 NavBar 区域
      */
     Navigation(this.pageStack) {
-      StartPage({ duration: 3 })
+      StartPage({ duration: 1 })
     }
     .hideToolBar(true)
     .hideTitleBar(true)

@@ -44,10 +44,11 @@ struct Home {
 
   private commonAttrModifier: commonAttributeModifier = new commonAttributeModifier();
 
+  // V1 中使用 @State 生效；V2 中必须为 titleAttributeModifier 类设置 @ObservedV2，属性设置 @Trace 才可以生效；
   @Local private titleAttrModifier: titleAttributeModifier = new titleAttributeModifier("首页");
 
   // 状态
-  @Local message: string = "Change Title '主页'";
+  private message: string = "Change Title '主页'";
 
   // 退出
   private back2Exit: BackToExit = new BackToExit(this.getUIContext());

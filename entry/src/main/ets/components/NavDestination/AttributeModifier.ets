@@ -1,5 +1,6 @@
 import { NavDestinationModifier } from '@kit.ArkUI';
 
+// NavDestinationModifier 内置属性修改器
 export default class commonAttributeModifier extends NavDestinationModifier {
   applyNormalAttribute?(instance: NavDestinationAttribute): void {
     // super.applyNormalAttribute(instance);
@@ -12,15 +13,17 @@ export default class commonAttributeModifier extends NavDestinationModifier {
   }
 }
 
+// 自己实现属性修改器
+@ObservedV2
 export class titleAttributeModifier implements AttributeModifier<NavDestinationAttribute> {
-  private _title: string;
+  @Trace private _title: string;
 
-  constructor(value: string) {
-    this._title = value;
+  constructor(title: string) {
+    this._title = title;
   }
 
-  public set title(value: string) {
-    this._title = value;
+  public set title(title: string) {
+    this._title = title;
   }
 
   applyNormalAttribute(instance: NavDestinationAttribute): void {

@@ -68,7 +68,7 @@ struct Login {
             this.pageStack.replacePathByName("Home", { name: "Mino" }, true);
 
             this.loading = false;
-          }, 1000)
+          }, 500)
         })
       }
       .padding({
