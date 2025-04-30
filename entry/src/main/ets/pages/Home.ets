@@ -1,17 +1,24 @@
 // @formatter:on
-import { SymbolGlyphModifier } from '@kit.ArkUI';
+import { AppStorageV2, SymbolGlyphModifier } from '@kit.ArkUI';
 import { common } from '@kit.AbilityKit';
 import BackToExit from '../utils/BackToExit';
 import commonAttributeModifier, { titleAttributeModifier } from "ets/components/NavDestination/AttributeModifier"
+import { MyStore } from "ets/types/index";
 
 @Builder
 export function HomeBuilder(name: string, param: Object) {
   Home();
 }
 
-@Component
+interface userDataType {
+  name: string;
+}
+
+@ComponentV2
 struct Home {
-  @StorageProp("statusBarHeight") statusBarHeight: number = 0;
+  @Consumer("pageStack") pageStack: NavPathStack = new NavPathStack();
+
+  @Local statusBarHeight: number = (AppStorageV2.connect(MyStore, "statusBarHeight") as MyStore).statusBarHeight;
 
   // 路由：菜单项
   private navigationMenuItems: Array<NavigationMenuItem> = [
@@ -37,15 +44,18 @@ struct Home {
 
   private commonAttrModifier: commonAttributeModifier = new commonAttributeModifier();
 
-  @State private titleAttrModifier: titleAttributeModifier = new titleAttributeModifier("首页");
+  @Local private titleAttrModifier: titleAttributeModifier = new titleAttributeModifier("首页");
+
+  // 状态
+  @Local message: string = "Change Title '主页'";
 
   // 退出
   private back2Exit: BackToExit = new BackToExit(this.getUIContext());
 
-  // 状态
-  @State message: string = "Change Title '主页'";
-
   aboutToAppear(): void {
+    const username = (this.pageStack.getParamByName("Home") as userDataType[])[0].name as string;
+    this.getUIContext().getPromptAction().showToast({ message: `欢迎登录 ${username}.` });
+
     const ctx = this.getUIContext().getHostContext() as common.UIAbilityContext;
     const windowClass = ctx.windowStage.getMainWindowSync();
 

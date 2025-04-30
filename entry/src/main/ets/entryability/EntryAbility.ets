@@ -1,6 +1,8 @@
 import { AbilityConstant, ConfigurationConstant, UIAbility, Want } from '@kit.AbilityKit';
 import { hilog } from '@kit.PerformanceAnalysisKit';
-import { window } from '@kit.ArkUI';
+import { window, AppStorageV2 } from '@kit.ArkUI';
+
+import { MyStore } from "ets/types/index"
 
 const DOMAIN = 0x0000;
 
@@ -31,7 +33,21 @@ export default class EntryAbility extends UIAbility {
 
       // 获取并设置状态栏高度
       const avoidArea = windowClass.getWindowAvoidArea(window.AvoidAreaType.TYPE_SYSTEM);
-      AppStorage.setOrCreate("statusBarHeight", avoidArea.topRect.height);
+
+      // V1 状态管理
+      // AppStorage.setOrCreate("statusBarHeight", avoidArea.topRect.height);
+
+      /**
+       * V2 状态管理：必须引入 AppStorageV2
+       * 1. 存储 statusBarHeight，值是 126
+       * 2. 存储 MyStore，值是 1
+       */
+      AppStorageV2.connect(MyStore, "statusBarHeight", () => new MyStore(avoidArea.topRect.height))
+      AppStorageV2.connect(MyStore, () => new MyStore(1));
+
+      const height1: MyStore = AppStorageV2.connect(MyStore, "statusBarHeight") as MyStore;
+      const height2: MyStore = AppStorageV2.connect(MyStore) as MyStore;
+      // console.log("height: ", JSON.stringify(height1), JSON.stringify(height2)); // 126   1
     });
   }
 

@@ -4,10 +4,10 @@ import { window } from "@kit.ArkUI";
 import { common } from "@kit.AbilityKit";
 
 @Entry
-@Component
+@ComponentV2
 struct Index {
   // 路由页面栈
-  private pageStack: NavPathStack = new NavPathStack();
+  @Provider() pageStack: NavPathStack = new NavPathStack();
 
   /**
    * navDestination 的构建函数
@@ -25,7 +25,6 @@ struct Index {
   }
 
   aboutToAppear() {
-    // TODO: 封装隐藏状态栏逻辑；移除Timer逻辑；封装返回按钮的禁用逻辑；
     const ctx = this.getUIContext().getHostContext() as common.UIAbilityContext;
     const windowStage: window.WindowStage = ctx.windowStage as window.WindowStage; // createSubWindow...
     const windowClass = windowStage.getMainWindowSync();
@@ -66,7 +65,7 @@ struct Index {
      *  .hideToolBar, .hideTitleBar 后，子组件内容将占满整个 NavBar 区域
      */
     Navigation(this.pageStack) {
-      StartPage({ duration: 3, pageStack: this.pageStack })
+      StartPage({ duration: 3 })
     }
     .hideToolBar(true)
     .hideTitleBar(true)
@@ -75,15 +74,16 @@ struct Index {
   }
 }
 
-@Component
+@ComponentV2
 struct StartPage {
   // 启动页时长
-  @Prop duration: number = 0;
+  @Param @Once duration: number = 0;
 
   // 定时器
   private timerData: TimerData | undefined;
 
-  pageStack: NavPathStack = new NavPathStack();
+  // pageStack: NavPathStack = new NavPathStack(); 可以通过组件属性传递 pageStack
+  @Consumer('pageStack') pageStack: NavPathStack = new NavPathStack();
 
   aboutToAppear(): void {
     // Tips: Harmony 的 setInterval 居然是从 0 开始，和 JavaScript 不同
@@ -103,8 +103,7 @@ struct StartPage {
       Timer.clear(this.timerData);
     }
 
-    this.getUIContext().getPromptAction().showToast({ message: "Welcome login." });
-    this.pageStack.replacePathByName("Home", {}, true);
+    this.pageStack.replacePathByName("Login", {}, true);
   }
 
   aboutToDisappear(): void {
